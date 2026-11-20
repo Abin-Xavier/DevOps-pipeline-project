@@ -1,0 +1,51 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: taskdb
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:?Set MSSQL_SA_PASSWORD in the .env file}
+    volumes:
+      - sqldata:/var/opt/mssql
+    networks:
+      - appnet
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ../app/api
+    image: taskapi:compose
+    container_name: taskapi
+    ports:
+      - "5000:8080"
+    networks:
+      - appnet
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ../app/frontend
+    image: taskfrontend:compose
+    container_name: taskfrontend
+    ports:
+      - "4200:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - appnet
+    restart: unless-stopped
+
+networks:
+  appnet:
+    driver: bridge
+
+volumes:
+  sqldata:
