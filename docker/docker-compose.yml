@@ -23,8 +23,13 @@ services:
       context: ../app/api
     image: taskapi:compose
     container_name: taskapi
+    environment:
+      ConnectionStrings__Default: "Server=db;Database=TaskDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
     ports:
       - "5000:8080"
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
       - appnet
     restart: unless-stopped
