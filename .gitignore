@@ -427,3 +427,11 @@ FodyWeavers.xsd
 
 # secrets
 .env
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+*.pem
+crash.log
