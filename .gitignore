@@ -437,3 +437,5 @@ terraform.tfvars
 crash.log
 
 *.tfplan
+
+backup-day6/
