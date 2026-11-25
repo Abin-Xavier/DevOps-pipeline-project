@@ -38,3 +38,9 @@ variable "public_key_path" {
   type        = string
   default     = "~/.ssh/devops-key.pub"
 }
+
+variable "state_bucket_name" {
+  description = "Bucket the server may read from (app-config/ prefix only)"
+  type        = string
+  default     = "devops-pipeline-tfstate-198233241679"
+}
