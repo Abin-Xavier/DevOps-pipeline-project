@@ -1,0 +1,14 @@
+---
+- name: Configure the web server
+  hosts: web
+  become: true
+
+  vars:
+    deploy_user: deploy
+    deploy_public_key: "{{ lookup('file', '~/.ssh/devops-key.pub') }}"
+
+  roles:
+    - base
+    - users
+    - ssh_hardening
+    - docker
