@@ -4,7 +4,6 @@
     name:
       - nginx
       - certbot
-      - python3-certbot-nginx
     state: present
     update_cache: true
 
@@ -22,13 +21,20 @@
     group: root
     mode: "0644"
 
-- name: Deploy the site config
+- name: Check whether a certificate already exists
+  ansible.builtin.stat:
+    path: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+  register: cert_file
+
+- name: Deploy the site config (HTTP only until a certificate exists)
   ansible.builtin.template:
     src: site.conf.j2
     dest: "/etc/nginx/sites-available/{{ domain_name }}.conf"
     owner: root
     group: root
     mode: "0644"
+  vars:
+    cert_exists: "{{ cert_file.stat.exists }}"
   notify: Reload nginx
 
 - name: Enable the site
@@ -38,7 +44,7 @@
     state: link
   notify: Reload nginx
 
-- name: Check the Nginx config before going on
+- name: Check the Nginx config
   ansible.builtin.command: nginx -t
   changed_when: false
 
@@ -51,15 +57,29 @@
 - name: Apply pending Nginx changes now
   ansible.builtin.meta: flush_handlers
 
-- name: Get or renew the certificate and set up the HTTPS redirect
+- name: Obtain the certificate (webroot challenge, no Nginx edits)
   ansible.builtin.command: >
-    certbot --nginx
-    --non-interactive --agree-tos --redirect
+    certbot certonly --webroot -w /var/www/html
+    --non-interactive --agree-tos
     --email {{ certbot_email }}
     -d {{ domain_name }}
     {{ '--staging' if certbot_staging | bool else '' }}
   args:
     creates: "/etc/letsencrypt/live/{{ domain_name }}/fullchain.pem"
+
+- name: Rewrite the site config with HTTPS now that the certificate exists
+  ansible.builtin.template:
+    src: site.conf.j2
+    dest: "/etc/nginx/sites-available/{{ domain_name }}.conf"
+    owner: root
+    group: root
+    mode: "0644"
+  vars:
+    cert_exists: true
+  notify: Reload nginx
+
+- name: Apply the HTTPS config
+  ansible.builtin.meta: flush_handlers
 
 - name: Make sure the Certbot renewal timer is on
   ansible.builtin.service:
