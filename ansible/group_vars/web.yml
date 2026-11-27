@@ -1,0 +1,4 @@
+---
+domain_name: abin-devops.duckdns.org
+certbot_email: abinxavier88@gmail.com
+certbot_staging: true

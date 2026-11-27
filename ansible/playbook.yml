@@ -12,3 +12,4 @@
     - users
     - ssh_hardening
     - docker
+    - nginx
