@@ -5,6 +5,7 @@ module "network" {
   vpc_cidr           = var.vpc_cidr
   public_subnet_cidr = var.public_subnet_cidr
   my_ip_cidr         = var.my_ip_cidr
+  ssh_open_to_world  = var.ssh_open_to_world
 }
 
 module "compute" {

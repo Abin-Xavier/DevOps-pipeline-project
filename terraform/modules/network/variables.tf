@@ -13,3 +13,8 @@ variable "public_subnet_cidr" {
 variable "my_ip_cidr" {
   type = string
 }
+
+variable "ssh_open_to_world" {
+  type    = bool
+  default = false
+}

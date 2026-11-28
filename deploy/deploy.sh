@@ -15,7 +15,7 @@ log() { echo "[deploy $(date +%H:%M:%S)] $*"; }
 start_stack() {
   local tag="$1"
   IMAGE_TAG="$tag" docker compose -f "$COMPOSE" pull
-  IMAGE_TAG="$tag" docker compose -f "$COMPOSE" up -d --remove-orphans
+  IMAGE_TAG="$tag" docker compose -f "$COMPOSE" up -d --remove-orphans --force-recreate
 }
 
 wait_healthy() {

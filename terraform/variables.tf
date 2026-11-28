@@ -44,3 +44,9 @@ variable "state_bucket_name" {
   type        = string
   default     = "devops-pipeline-tfstate-198233241679"
 }
+
+variable "ssh_open_to_world" {
+  description = "Open SSH to the internet so GitHub Actions can deploy. Keep false when not deploying."
+  type        = bool
+  default     = false
+}

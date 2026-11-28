@@ -82,3 +82,13 @@ resource "aws_vpc_security_group_egress_rule" "all_out" {
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
+
+resource "aws_vpc_security_group_ingress_rule" "ssh_ci" {
+  count             = var.ssh_open_to_world ? 1 : 0
+  security_group_id = aws_security_group.web.id
+  description       = "SSH for GitHub Actions deploys (key-only login, temporary)"
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 22
+  to_port           = 22
+  ip_protocol       = "tcp"
+}
