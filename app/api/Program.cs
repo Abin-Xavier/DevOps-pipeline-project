@@ -4,12 +4,16 @@ using TaskApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Connection string comes from configuration (environment variable in Docker).
-// The fallback is only a placeholder with no secret, used by the EF tooling.
-var connectionString = builder.Configuration.GetConnectionString("Default")
-    ?? "Server=localhost;Database=TaskDb;TrustServerCertificate=True";
+// With a connection string (local Compose) use SQL Server.
+// Without one (the small cloud server) use an in-memory store.
+var connectionString = builder.Configuration.GetConnectionString("Default");
+var useSqlServer = !string.IsNullOrWhiteSpace(connectionString);
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<AppDbContext>(options =>
+{
+    if (useSqlServer) options.UseSqlServer(connectionString);
+    else options.UseInMemoryDatabase("tasks");
+});
 
 builder.Services.AddCors(options =>
     options.AddPolicy("frontend", policy =>
@@ -20,11 +24,11 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 app.UseCors("frontend");
 
-// Create or update the database tables at startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    if (useSqlServer) db.Database.Migrate();
+    else db.Database.EnsureCreated();
 }
 
 app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }));

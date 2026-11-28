@@ -21,3 +21,15 @@
     user: "{{ deploy_user }}"
     key: "{{ deploy_public_key }}"
     state: present
+
+- name: Add the GitHub Actions deploy key for the deploy user
+  ansible.posix.authorized_key:
+    user: "{{ deploy_user }}"
+    key: "{{ lookup('file', '~/.ssh/github-deploy.pub') }}"
+    state: present
+
+- name: Add the GitHub Actions deploy key for the deploy user
+  ansible.posix.authorized_key:
+    user: "{{ deploy_user }}"
+    key: "{{ lookup('file', '~/.ssh/github-deploy.pub') }}"
+    state: present
