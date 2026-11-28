@@ -31,7 +31,7 @@ using (var scope = app.Services.CreateScope())
     else db.Database.EnsureCreated();
 }
 
-app.MapGet("/health", () => Results.Ok(new { status = "Healthy" }));
+app.MapGet("/health", () => Results.StatusCode(500)); // BROKEN ON PURPOSE
 
 app.MapGet("/api/tasks", async (AppDbContext db) =>
     await db.Tasks.OrderBy(t => t.Id).ToListAsync());
@@ -47,3 +47,4 @@ app.MapPost("/api/tasks", async (NewTask input, AppDbContext db) =>
 app.Run();
 
 record NewTask(string Title);
+
