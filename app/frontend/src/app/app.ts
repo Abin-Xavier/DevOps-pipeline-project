@@ -23,7 +23,7 @@ interface Task {
 export class App implements OnInit {
   status = signal('checking...');
   tasks = signal<Task[]>([]);
-  private api = 'http://localhost:5000';
+    private api = '';
 
   async ngOnInit() {
     try {
