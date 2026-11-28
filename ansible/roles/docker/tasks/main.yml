@@ -39,3 +39,27 @@
     name: "{{ deploy_user }}"
     groups: docker
     append: true
+
+- name: Create the app directory for the deploy user
+  ansible.builtin.file:
+    path: "/home/{{ deploy_user }}/app"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0755"
+
+- name: Install the production compose file
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../deploy/docker-compose.prod.yml"
+    dest: "/home/{{ deploy_user }}/app/docker-compose.prod.yml"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0644"
+
+- name: Install the deploy script
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/../deploy/deploy.sh"
+    dest: "/home/{{ deploy_user }}/app/deploy.sh"
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+    mode: "0755"

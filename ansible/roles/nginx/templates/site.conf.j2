@@ -19,19 +19,29 @@ server {
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_session_cache   shared:SSL:10m;
 
-    root /var/www/html;
-    index index.html;
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
 
     location / {
-        try_files $uri $uri/ =404;
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 {% else %}
-    root /var/www/html;
-    index index.html;
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
+    }
 
     location / {
-        try_files $uri $uri/ =404;
+        proxy_pass http://127.0.0.1:8081;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 {% endif %}
